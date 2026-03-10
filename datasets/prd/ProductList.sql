@@ -1,0 +1,5 @@
+SELECT distinct customfield_11266 as products
+FROM "prd_hudi_rwz_cfn"."jira_rwz_issues"
+where issuetype_id = '10456'
+	and customfield_11266 is not null
+order by 1 asc
