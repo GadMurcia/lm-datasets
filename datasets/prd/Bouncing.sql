@@ -20,7 +20,7 @@ WITH
 			WHEN items_tostring LIKE '%Troubleshooting%' THEN 'Troubleshooting'
 			WHEN items_tostring LIKE '%Done%' THEN 'Done' ELSE NULL
 		END AS new_status
-        FROM "dev_hudi_rwz_cfn"."jira_rwz_changelog_histories"
+        FROM "prd_hudi_rwz_cfn"."jira_rwz_changelog_histories"
         WHERE items_field LIKE '%status%'
     ),
     status_changes
@@ -46,7 +46,7 @@ WITH
 			ORDER BY sc.change_date
 		) AS next_change_date
         FROM status_changes sc
-            INNER JOIN "dev_hudi_rwz_cfn"."jira_rwz_issues" jri ON sc.issue_key = jri.key
+            INNER JOIN "prd_hudi_rwz_cfn"."jira_rwz_issues" jri ON sc.issue_key = jri.key
     ),
     status_summary
     AS
@@ -80,7 +80,7 @@ WITH
     AS
     (
         SELECT jri.key AS issue_key
-        FROM "dev_hudi_rwz_cfn"."jira_rwz_issues" jri
+        FROM "prd_hudi_rwz_cfn"."jira_rwz_issues" jri
         WHERE jri.key NOT IN (
 			SELECT issue_key
         FROM status_summary
@@ -102,11 +102,11 @@ WITH
 				to_unixtime(from_iso8601_timestamp(flt.first_leave_date)) - to_unixtime(from_iso8601_timestamp(jri.created))
 			) / 86400.0
 		) AS days_to_leave_todo
-            FROM "dev_hudi_rwz_cfn"."jira_rwz_issues" jri
+            FROM "prd_hudi_rwz_cfn"."jira_rwz_issues" jri
                 LEFT JOIN status_summary ss ON jri.key = ss.issue_key
                 LEFT JOIN first_leave_todo flt ON jri.key = flt.issue_key
-                INNER JOIN "dev_hudi_rwz_cfn"."jira_rwz_projects" pr ON jri.project_id = pr.id
-                INNER JOIN "dev_hudi_rwz_cfn"."jira_rwz_issuetypes" t ON jri.issuetype_id = t.id
+                INNER JOIN "prd_hudi_rwz_cfn"."jira_rwz_projects" pr ON jri.project_id = pr.id
+                INNER JOIN "prd_hudi_rwz_cfn"."jira_rwz_issuetypes" t ON jri.issuetype_id = t.id
         UNION ALL
             SELECT t.name AS tipo,
                 jri.key,
@@ -121,9 +121,9 @@ WITH
 			) / 86400.0
 		) AS days_to_leave_todo
             FROM issues_without_todo iwt
-                INNER JOIN "dev_hudi_rwz_cfn"."jira_rwz_issues" jri ON iwt.issue_key = jri.key
-                INNER JOIN "dev_hudi_rwz_cfn"."jira_rwz_projects" pr ON jri.project_id = pr.id
-                INNER JOIN "dev_hudi_rwz_cfn"."jira_rwz_issuetypes" t ON jri.issuetype_id = t.id
+                INNER JOIN "prd_hudi_rwz_cfn"."jira_rwz_issues" jri ON iwt.issue_key = jri.key
+                INNER JOIN "prd_hudi_rwz_cfn"."jira_rwz_projects" pr ON jri.project_id = pr.id
+                INNER JOIN "prd_hudi_rwz_cfn"."jira_rwz_issuetypes" t ON jri.issuetype_id = t.id
                 LEFT JOIN first_leave_todo flt ON jri.key = flt.issue_key
     )
 SELECT p.tipo,

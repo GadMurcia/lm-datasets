@@ -1,4 +1,4 @@
-SELECT resolved,
+SELECT SUBSTRING(resolved, 1, 10) as resolved,
     key,
     customfield_12002 AS origen_call,
     TRIM(component) AS component

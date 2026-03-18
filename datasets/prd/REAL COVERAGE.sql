@@ -1,6 +1,6 @@
 SELECT i.key,
     i.components,
-    i.created,
+    SUBSTRING(i.created, 1, 10) as created,
     i.summary,
     i.customfield_11800 as passed,
     i.customfield_11801 as totalExecuted,

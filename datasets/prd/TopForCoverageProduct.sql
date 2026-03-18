@@ -1,5 +1,5 @@
 WITH build AS (
-	SELECT resolved,
+	SELECT SUBSTRING(resolved, 1, 19) as resolved,
 		key,
 		customfield_12002 AS origen_call,
 		customfield_11266 AS products
