@@ -1,0 +1,10 @@
+{
+	"name": "changelogbugs",
+	"sql": "WITH months AS (SELECT DATE_TRUNC('month', current_date) - INTERVAL '1' month * i AS month_start FROM UNNEST(SEQUENCE(0, 120)) AS t(i)), open_bugs AS (SELECT m.month_start, j.customfield_11784 as razonDelBug, COUNT(*) AS open_bugs_count FROM months m LEFT JOIN prd_hudi_rwz_cfn.jira_rwz_issues j ON DATE_PARSE(SUBSTR(j.created, 1, 19), '%Y-%m-%dT%H:%i:%s') <= DATE_ADD('day', -1, DATE_ADD('month', 1, m.month_start)) AND (j.resolved IS NULL OR DATE_PARSE(SUBSTR(j.resolved, 1, 19), '%Y-%m-%dT%H:%i:%s') > DATE_ADD('day', -1, DATE_ADD('month', 1, m.month_start))) WHERE j.issuetype_id = '10103' GROUP BY m.month_start, j.customfield_11784 ORDER BY m.month_start) SELECT DATE_FORMAT(month_start, '%Y-%m-%d') AS month, razonDelBug, open_bugs_count FROM open_bugs;",
+	"CalculatedField": {
+		"BUG SOURCE": "ifelse(isNull(razonDelBug), 'unspecified source', razonDelBug)",
+		"COUNT": "{open_bugs_count}",
+		"TOTAL": "{open_bugs_count}"
+	},
+	"Parameters": {}
+}
