@@ -1,0 +1,28 @@
+{
+    "name": "All_Effort",
+    "sql": "SELECT b.name as tipo, c.name as project, a.key as clave, a.assignee as aignado, a.customfield_10103 as sprint, a.customfield_11266 as producto, substr(a.created, 1, 19) as creacion, substr(a.updated, 1, 19) as actualizado, a.priority as prioridad, a.components as componentes, c.projectcategory_name as categoria, a.status as estado, a.customfield_11440 as QA_Asignado, a.labels as etiquetas, substr(a.resolved, 1, 19) as fechaResolucion, substr(a.customfield_11433, 1, 19) as RealEndDate, a.customfield_11798 as TestExecutionSource, a.customfield_11609 as TotalQAStoryPoints, a.customfield_11603 as QAStoryPoints, A.customfield_10105 AS StoryPoints FROM prd_hudi_rwz_cfn.jira_rwz_issues a inner join prd_hudi_rwz_cfn.jira_rwz_issuetypes b on (a.issuetype_id = b.id) inner join prd_hudi_rwz_cfn.jira_rwz_projects c on (a.project_id = c.id) where a.status_dl = 'true'",
+    "dateDields": [
+        "creacion",
+        "actualizado",
+        "fechaResolucion",
+        "RealEndDate"
+    ],
+    "decimalFields": [
+        "TotalQAStoryPoints",
+        "QAStoryPoints",
+        "StoryPoints"
+    ],
+    "CalculatedField": {
+        "EFFORT IN INTERNAL SPRINT": "ifelse((project = 'QA Boards' AND isNotNull(sprint)), StoryPoints, 0)",
+        "EFFORT INVESTED IN SCRUM TEAMS (SPRINTS, SUPPORT KANBAN)": "ifelse((tipo = 'Bug' OR tipo = 'Story' OR tipo = 'Technical Story'), QAStoryPoints, 0)",
+        "effortInSprint": "ifelse(isNull(sprint),  0, StoryPoints)",
+        "effortOutsideSprint": "ifelse(isNull(sprint), QAStoryPoints, 0)",
+        "INTERNAL INITIATIVES (OUT OF SPRINT)": "ifelse((project = 'QA Boards' AND isNull(sprint)), StoryPoints, 0)",
+        "internal effort": "{INTERNAL INITIATIVES (OUT OF SPRINT)}+{EFFORT IN INTERNAL SPRINT}",
+        "Test Excecution Source": "ifelse(isNull(TestExecutionSource), 'Empty', TestExecutionSource)",
+        "TEST EXECUTION (INTEGRATED TESTS, SHARED TESTING & REGRESSION)": "ifelse((tipo='Test Execution' OR tipo = 'Sub Test Execution') AND (TestExecutionSource = 'Shared testing' OR TestExecutionSource = 'Integrated tests'  OR TestExecutionSource = 'Regression'), TotalQAStoryPoints, 0)",
+        "other effort": "{TEST EXECUTION (INTEGRATED TESTS, SHARED TESTING & REGRESSION)}+{EFFORT INVESTED IN SCRUM TEAMS (SPRINTS, SUPPORT KANBAN)}",
+        "TOTAL EFFORT": "{EFFORT INVESTED IN SCRUM TEAMS (SPRINTS, SUPPORT KANBAN)}+{TEST EXECUTION (INTEGRATED TESTS, SHARED TESTING & REGRESSION)}+{INTERNAL INITIATIVES (OUT OF SPRINT)}+{EFFORT IN INTERNAL SPRINT}"
+    },
+    "Parameters": {}
+}
